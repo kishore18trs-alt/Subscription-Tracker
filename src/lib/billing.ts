@@ -94,3 +94,6 @@ export function formatMoney(amount: number, currency: string) {
     return `${currency} ${amount.toFixed(2)}`
   }
 }
+
+// EXPERIMENT: intentional type error to see CI fail — remove after
+export const x: number = "hello"
