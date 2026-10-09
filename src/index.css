@@ -1,0 +1,104 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Bricolage Grotesque", "Plus Jakarta Sans", ui-sans-serif, sans-serif;
+}
+
+/* ───────────── Landing page: 3D orbit, float, marquee, reveal ───────────── */
+
+/* The ring plane is tilted back by --tilt; each logo counter-rotates so it always faces the viewer. */
+.orbit-ring {
+  --tilt: 68deg;
+  transform-style: preserve-3d;
+  animation: orbit-spin var(--speed, 40s) linear infinite;
+}
+.orbit-ring > * {
+  transform-style: preserve-3d;
+}
+.orbit-face {
+  animation: orbit-counter var(--speed, 40s) linear infinite;
+}
+.orbit-ring.reverse,
+.orbit-ring.reverse .orbit-face {
+  animation-direction: reverse;
+}
+@keyframes orbit-spin {
+  from { transform: rotateZ(0deg); }
+  to { transform: rotateZ(360deg); }
+}
+@keyframes orbit-counter {
+  from { transform: rotateZ(calc(-1 * var(--a))) rotateZ(0deg) rotateX(calc(-1 * var(--tilt))); }
+  to { transform: rotateZ(calc(-1 * var(--a))) rotateZ(-360deg) rotateX(calc(-1 * var(--tilt))); }
+}
+@keyframes float-y {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-14px); }
+}
+@keyframes marquee {
+  to { transform: translateX(-50%); }
+}
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.55; transform: scale(1); }
+  50% { opacity: 0.9; transform: scale(1.08); }
+}
+.animate-float { animation: float-y 6s ease-in-out infinite; }
+.animate-marquee { animation: marquee 40s linear infinite; }
+.animate-glow { animation: glow-pulse 5s ease-in-out infinite; }
+
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.9s cubic-bezier(0.2, 0.7, 0.2, 1), transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.reveal.in {
+  opacity: 1;
+  transform: none;
+}
+
+/* Film grain over the dark landing page. */
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.07;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orbit-ring, .orbit-face, .animate-float, .animate-marquee, .animate-glow { animation: none !important; }
+  .orbit-face { transform: rotateZ(calc(-1 * var(--a))) rotateX(calc(-1 * var(--tilt))); }
+  .reveal { opacity: 1; transform: none; }
+}
+
+body {
+  @apply bg-slate-50 text-slate-900 antialiased;
+  background-image:
+    radial-gradient(60rem 30rem at 100% -10%, rgb(224 231 255 / 0.7), transparent 60%),
+    radial-gradient(40rem 24rem at -10% 0%, rgb(245 208 254 / 0.35), transparent 60%);
+  background-attachment: fixed;
+}
+
+@keyframes toast-countdown {
+  from { width: 100%; }
+  to { width: 0%; }
+}
+
+@layer components {
+  .card {
+    @apply rounded-2xl bg-white shadow-sm ring-1 ring-slate-200/80;
+  }
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm shadow-indigo-600/20 transition hover:bg-indigo-700 active:scale-[0.98] disabled:opacity-60;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900;
+  }
+  .input {
+    @apply mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 text-[15px] outline-none transition placeholder:text-slate-400 focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-100;
+  }
+  .label {
+    @apply text-sm font-semibold text-slate-700;
+  }
+}
