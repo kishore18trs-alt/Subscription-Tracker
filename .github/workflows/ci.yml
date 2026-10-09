@@ -1,0 +1,29 @@
+name: CI                         # name shown in GitHub's "Actions" tab
+
+on:                              # WHEN to run
+  push:
+    branches: [main]             # every push to main
+  pull_request:                  # every Pull Request
+
+permissions:
+  contents: read                 # least privilege: the job can only read the code
+
+concurrency:                     # push twice quickly → cancel the older run
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:                         # job name (you'll select this in branch protection later)
+    runs-on: ubuntu-latest       # a fresh Linux machine from GitHub
+    timeout-minutes: 10          # never hang forever
+
+    steps:
+      - uses: actions/checkout@v4      # 1. download your code
+      - uses: actions/setup-node@v4    # 2. install Node.js
+        with:
+          node-version: 22
+          cache: npm                   #    cache packages so later runs are faster
+      - run: npm ci                    # 3. clean install from package-lock.json
+      - run: npm run typecheck         # 4. type errors?
+      - run: npm test                  # 5. tests pass?
+      - run: npm run build             # 6. production build works?
